@@ -19,9 +19,9 @@ function parseTrendingHTML(html: string): TrendingRepo[] {
   while ((match = articleRegex.exec(html)) !== null && repos.length < 10) {
     const block = match[1]
 
-    const nameMatch = block.match(/href="\/([^"]+?)"/)
+    const nameMatch = block.match(/href="\/([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)"/)
     const fullName = nameMatch ? nameMatch[1].trim() : ''
-    if (!fullName) continue
+    if (!isRepositoryPath(fullName)) continue
 
     const parts = fullName.split('/')
     const name = parts.length > 1 ? parts[1] : fullName
@@ -56,6 +56,33 @@ function parseTrendingHTML(html: string): TrendingRepo[] {
   }
 
   return repos
+}
+
+function isRepositoryPath(path: string): boolean {
+  const [owner, repo, ...rest] = path.split('/')
+  if (!owner || !repo || rest.length > 0) return false
+
+  const reservedOwners = new Set([
+    'account',
+    'apps',
+    'collections',
+    'enterprise',
+    'features',
+    'github',
+    'login',
+    'marketplace',
+    'new',
+    'notifications',
+    'orgs',
+    'pricing',
+    'search',
+    'settings',
+    'sponsors',
+    'topics',
+    'trending',
+  ])
+
+  return !reservedOwners.has(owner.toLowerCase())
 }
 
 function parseNumber(text: string): number {

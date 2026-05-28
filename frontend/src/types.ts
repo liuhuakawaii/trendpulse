@@ -28,15 +28,15 @@ export interface AIConfig {
 }
 
 export const NEWS_CATEGORIES = [
-  { key: 'tech', label: '科技', icon: '💻' },
-  { key: 'business', label: '商业', icon: '📈' },
-  { key: 'science', label: '科学', icon: '🔬' },
-  { key: 'world', label: '国际', icon: '🌍' },
-  { key: 'health', label: '健康', icon: '🏥' },
+  { key: 'tech', label: 'Technology', shortLabel: 'Tech' },
+  { key: 'business', label: 'Business', shortLabel: 'Biz' },
+  { key: 'science', label: 'Science', shortLabel: 'Sci' },
+  { key: 'world', label: 'World', shortLabel: 'World' },
+  { key: 'health', label: 'Health', shortLabel: 'Health' },
 ] as const
 
 export const AI_MODELS: Record<AIProviderType, string[]> = {
-  claude: ['claude-sonnet-4-20250514', 'claude-haiku-4-5-20251001'],
-  openai: ['gpt-4o-mini', 'gpt-4o', 'gpt-3.5-turbo'],
+  claude: ['claude-sonnet-4-20250514', 'claude-haiku-3-5-20241022'],
+  openai: ['gpt-4o-mini', 'gpt-4o', 'gpt-4.1-mini'],
   custom: ['default'],
 }

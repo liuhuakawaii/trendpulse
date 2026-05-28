@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { AIConfig, AIProviderType } from '../types'
 import { AI_MODELS } from '../types'
 
@@ -10,10 +10,6 @@ interface SettingsPanelProps {
 
 export default function SettingsPanel({ config, onSave, onClose }: SettingsPanelProps) {
   const [form, setForm] = useState<AIConfig>(config)
-
-  useEffect(() => {
-    setForm(config)
-  }, [config])
 
   const handleSave = () => {
     onSave(form)

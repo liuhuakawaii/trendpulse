@@ -6,6 +6,6 @@
     "dev:worker": "cd worker && npm run dev",
     "build": "cd frontend && npm run build",
     "deploy:worker": "cd worker && npm run deploy",
-    "deploy:frontend": "cd frontend && npx wrangler pages deploy dist --project-name trendpulse"
+    "deploy:frontend": "cd frontend && npm run deploy"
   }
 }

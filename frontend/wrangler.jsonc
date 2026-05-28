@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "trendpulse",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-05-28",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}

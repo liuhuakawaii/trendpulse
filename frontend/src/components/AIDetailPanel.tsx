@@ -80,7 +80,7 @@ function formatMarkdown(text: string): string {
     .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
     .replace(/`(.*?)`/g, '<code class="bg-slate-800 px-1.5 py-0.5 rounded text-violet-400 text-sm">$1</code>')
-    .replace(/^\- (.*$)/gm, '<li class="ml-4">$1</li>')
+    .replace(/^- (.*$)/gm, '<li class="ml-4">$1</li>')
     .replace(/^\d+\. (.*$)/gm, '<li class="ml-4 list-decimal">$1</li>')
     .replace(/\n\n/g, '<br/><br/>')
 }
