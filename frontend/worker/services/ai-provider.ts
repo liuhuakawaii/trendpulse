@@ -39,6 +39,7 @@ export async function callAI(
   }
 }
 
+
 async function callClaude(
   provider: AIProvider,
   prompt: string
@@ -98,14 +99,21 @@ async function callCustom(
 ): Promise<ReadableStream<Uint8Array>> {
   if (!provider.endpoint) throw new Error('Custom provider requires endpoint')
 
-  const resp = await fetch(provider.endpoint, {
+  let endpoint = provider.endpoint.replace(/\/+$/, '')
+  if (!endpoint.endsWith('/chat/completions')) {
+    endpoint += '/chat/completions'
+  }
+
+  if (!provider.model) throw new Error('Custom provider requires model name')
+
+  const resp = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${provider.apiKey}`,
     },
     body: JSON.stringify({
-      model: provider.model || 'default',
+      model: provider.model,
       stream: true,
       messages: [{ role: 'user', content: prompt }],
     }),
@@ -179,3 +187,4 @@ function extractText(data: Record<string, unknown>, format: 'claude' | 'openai')
   const delta = choices[0].delta as Record<string, unknown> | undefined
   return (delta?.content as string) || ''
 }
+

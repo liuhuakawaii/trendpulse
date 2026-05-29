@@ -7,25 +7,20 @@ interface CategoryTabsProps {
 
 export default function CategoryTabs({ active, onChange }: CategoryTabsProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2">
+    <div className="flex gap-1 p-1 rounded-xl overflow-x-auto" style={{ background: 'var(--bg-hover)', border: '1px solid var(--border)' }}>
       {NEWS_CATEGORIES.map((category) => (
         <button
           key={category.key}
           type="button"
           onClick={() => onChange(category.key)}
           aria-pressed={active === category.key}
-          className={`flex items-center gap-2 whitespace-nowrap rounded-lg border px-4 py-2 text-sm font-medium transition-all active:scale-[0.98] ${
-            active === category.key
-              ? 'border-cyan-500/30 bg-cyan-600/20 text-cyan-300'
-              : 'border-transparent bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-slate-300'
-          }`}
+          className="flex-1 min-w-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          style={{
+            background: active === category.key ? 'var(--bg-hover-strong)' : 'transparent',
+            color: active === category.key ? 'var(--text-primary)' : 'var(--text-muted)',
+            boxShadow: active === category.key ? '0 1px 2px var(--shadow)' : 'none',
+          }}
         >
-          <span
-            aria-hidden="true"
-            className="grid h-5 min-w-8 place-items-center rounded-md bg-slate-950/50 px-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500"
-          >
-            {category.shortLabel}
-          </span>
           {category.label}
         </button>
       ))}

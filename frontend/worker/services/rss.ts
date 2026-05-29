@@ -6,6 +6,16 @@ const RSS_SOURCES: Record<string, string[]> = {
     'https://techcrunch.com/feed/',
     'https://www.theverge.com/rss/index.xml',
   ],
+  aiml: [
+    'https://news.mit.edu/topic/mitartificial-intelligence2-rss.xml',
+    'https://www.deeplearning.ai/the-batch/feed/',
+    'https://rss.arxiv.org/rss/cs.AI',
+  ],
+  programming: [
+    'https://dev.to/feed',
+    'https://css-tricks.com/feed/',
+    'https://www.smashingmagazine.com/feed/',
+  ],
   business: [
     'https://feeds.reuters.com/reuters/businessNews',
     'https://feeds.bbci.co.uk/news/business/rss.xml',
@@ -13,6 +23,15 @@ const RSS_SOURCES: Record<string, string[]> = {
   science: [
     'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
     'https://www.sciencedaily.com/rss/all.xml',
+  ],
+  gaming: [
+    'https://feeds.feedburner.com/ign/all',
+    'https://kotaku.com/rss',
+    'https://www.polygon.com/rss/index.xml',
+  ],
+  finance: [
+    'https://www.coindesk.com/arc/outboundfeeds/rss/',
+    'https://techcrunch.com/category/cryptocurrency/feed/',
   ],
   world: [
     'https://feeds.bbci.co.uk/news/world/rss.xml',
@@ -25,6 +44,8 @@ const RSS_SOURCES: Record<string, string[]> = {
 }
 
 export async function fetchNews(category: string): Promise<NewsItem[]> {
+  if (category === 'showhn') return fetchShowHN()
+
   const sources = RSS_SOURCES[category]
   if (!sources) return []
 
@@ -41,6 +62,13 @@ export async function fetchNews(category: string): Promise<NewsItem[]> {
 
   return items
     .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+    .slice(0, 20)
+}
+
+async function fetchShowHN(): Promise<NewsItem[]> {
+  const items = await fetchSingleRSS('https://hnrss.org/frontpage', 'showhn')
+  return items
+    .filter((item) => item.link.includes('github.com'))
     .slice(0, 20)
 }
 

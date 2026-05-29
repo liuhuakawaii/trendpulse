@@ -1,37 +1,19 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback } from 'react'
 import type { TrendingRepo, NewsItem } from './types'
-import { useGithub } from './hooks/useGithub'
 import { useAI } from './hooks/useAI'
-import { useTranslation } from './hooks/useTranslation'
+import { useTheme } from './hooks/useTheme'
 import Header from './components/Header'
-import GithubTrending from './components/GithubTrending'
-import NewsFeed from './components/NewsFeed'
+import Feed from './components/NewsFeed'
 import AIDetailPanel from './components/AIDetailPanel'
 import SettingsPanel from './components/SettingsPanel'
 
 export default function App() {
-  const { repos, loading: ghLoading, error: ghError, reload: ghReload } = useGithub()
   const { config, saveConfig, output, loading: aiLoading, error: aiError, explain, clearOutput } = useAI()
-  const { enabled: translateEnabled, translating, toggle: toggleTranslate, translateRepos, translateNews } = useTranslation()
+  const { theme, toggle: toggleTheme } = useTheme()
 
   const [showSettings, setShowSettings] = useState(false)
   const [aiTitle, setAiTitle] = useState('')
   const [showAI, setShowAI] = useState(false)
-  const [translatedRepos, setTranslatedRepos] = useState<TrendingRepo[]>(repos)
-  const reposRequestId = useRef(0)
-
-  useEffect(() => {
-    if (!translateEnabled || repos.length === 0) {
-      setTranslatedRepos(repos)
-      return
-    }
-    const id = ++reposRequestId.current
-    translateRepos(repos).then((result) => {
-      if (id === reposRequestId.current) {
-        setTranslatedRepos(result)
-      }
-    })
-  }, [repos, translateEnabled, translateRepos])
 
   const handleRepoExplain = useCallback(
     (repo: TrendingRepo) => {
@@ -63,28 +45,24 @@ export default function App() {
   }, [clearOutput])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[100dvh]" style={{ background: 'var(--bg-primary)' }}>
       <Header
         onSettingsClick={() => setShowSettings(true)}
-        translateEnabled={translateEnabled}
-        onToggleTranslate={toggleTranslate}
-        translateLoading={translating}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-12">
-        <GithubTrending
-          repos={translatedRepos}
-          loading={ghLoading}
-          error={ghError}
-          onReload={ghReload}
-          onExplain={handleRepoExplain}
-        />
-        <NewsFeed
-          onExplain={handleNewsExplain}
-          translateEnabled={translateEnabled}
-          translateNews={translateNews}
-        />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <Feed onRepoExplain={handleRepoExplain} onNewsExplain={handleNewsExplain} />
       </main>
+
+      {/* Footer */}
+      <footer className="max-w-7xl mx-auto px-4 sm:px-6 py-8 border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
+          <span>TrendPulse</span>
+          <span>Powered by Cloudflare Workers</span>
+        </div>
+      </footer>
 
       {showAI && (
         <AIDetailPanel
