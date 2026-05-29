@@ -7,6 +7,7 @@ export interface TrendingRepo {
   forks: number
   todayStars: number
   url: string
+  translatedDescription?: string
 }
 
 export interface NewsItem {
@@ -16,6 +17,8 @@ export interface NewsItem {
   pubDate: string
   source: string
   category: string
+  translatedTitle?: string
+  translatedDescription?: string
 }
 
 export type AIProviderType = 'claude' | 'openai' | 'custom'

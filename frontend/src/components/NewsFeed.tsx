@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { NewsItem } from '../types'
 import { useNews } from '../hooks/useNews'
 import CategoryTabs from './CategoryTabs'
@@ -6,11 +6,28 @@ import NewsCard from './NewsCard'
 
 interface NewsFeedProps {
   onExplain: (item: NewsItem) => void
+  translateEnabled: boolean
+  translateNews: (items: NewsItem[]) => Promise<NewsItem[]>
 }
 
-export default function NewsFeed({ onExplain }: NewsFeedProps) {
+export default function NewsFeed({ onExplain, translateEnabled, translateNews }: NewsFeedProps) {
   const [category, setCategory] = useState('tech')
   const { items, loading, error, reload } = useNews(category)
+  const [translatedItems, setTranslatedItems] = useState<NewsItem[]>(items)
+  const newsRequestId = useRef(0)
+
+  useEffect(() => {
+    if (!translateEnabled || items.length === 0) {
+      setTranslatedItems(items)
+      return
+    }
+    const id = ++newsRequestId.current
+    translateNews(items).then((result) => {
+      if (id === newsRequestId.current) {
+        setTranslatedItems(result)
+      }
+    })
+  }, [items, translateEnabled, translateNews])
 
   return (
     <section>
@@ -38,7 +55,7 @@ export default function NewsFeed({ onExplain }: NewsFeedProps) {
         </div>
       )}
 
-      {loading && items.length === 0 ? (
+      {loading && translatedItems.length === 0 ? (
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-32 rounded-xl bg-slate-800/50 animate-pulse" />
@@ -46,10 +63,10 @@ export default function NewsFeed({ onExplain }: NewsFeedProps) {
         </div>
       ) : (
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {items.map((item, i) => (
+          {translatedItems.map((item, i) => (
             <NewsCard key={`${item.link}-${i}`} item={item} onExplain={onExplain} />
           ))}
-          {items.length === 0 && !loading && (
+          {translatedItems.length === 0 && !loading && (
             <div className="col-span-2 text-center py-12 text-slate-500">
               No news found for this category
             </div>

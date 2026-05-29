@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import type { TrendingRepo, NewsItem } from './types'
 import { useGithub } from './hooks/useGithub'
 import { useAI } from './hooks/useAI'
+import { useTranslation } from './hooks/useTranslation'
 import Header from './components/Header'
 import GithubTrending from './components/GithubTrending'
 import NewsFeed from './components/NewsFeed'
@@ -11,10 +12,26 @@ import SettingsPanel from './components/SettingsPanel'
 export default function App() {
   const { repos, loading: ghLoading, error: ghError, reload: ghReload } = useGithub()
   const { config, saveConfig, output, loading: aiLoading, error: aiError, explain, clearOutput } = useAI()
+  const { enabled: translateEnabled, translating, toggle: toggleTranslate, translateRepos, translateNews } = useTranslation()
 
   const [showSettings, setShowSettings] = useState(false)
   const [aiTitle, setAiTitle] = useState('')
   const [showAI, setShowAI] = useState(false)
+  const [translatedRepos, setTranslatedRepos] = useState<TrendingRepo[]>(repos)
+  const reposRequestId = useRef(0)
+
+  useEffect(() => {
+    if (!translateEnabled || repos.length === 0) {
+      setTranslatedRepos(repos)
+      return
+    }
+    const id = ++reposRequestId.current
+    translateRepos(repos).then((result) => {
+      if (id === reposRequestId.current) {
+        setTranslatedRepos(result)
+      }
+    })
+  }, [repos, translateEnabled, translateRepos])
 
   const handleRepoExplain = useCallback(
     (repo: TrendingRepo) => {
@@ -47,17 +64,26 @@ export default function App() {
 
   return (
     <div className="min-h-screen">
-      <Header onSettingsClick={() => setShowSettings(true)} />
+      <Header
+        onSettingsClick={() => setShowSettings(true)}
+        translateEnabled={translateEnabled}
+        onToggleTranslate={toggleTranslate}
+        translateLoading={translating}
+      />
 
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-12">
         <GithubTrending
-          repos={repos}
+          repos={translatedRepos}
           loading={ghLoading}
           error={ghError}
           onReload={ghReload}
           onExplain={handleRepoExplain}
         />
-        <NewsFeed onExplain={handleNewsExplain} />
+        <NewsFeed
+          onExplain={handleNewsExplain}
+          translateEnabled={translateEnabled}
+          translateNews={translateNews}
+        />
       </main>
 
       {showAI && (

@@ -5,7 +5,7 @@
 
 ## 项目概述
 
-TrendPulse 是一个实时科技趋势仪表盘，部署在 Cloudflare 边缘平台上。聚合 GitHub Trending 仓库和多源 RSS 新闻，并提供 AI 分析能力。
+TrendPulse 是一个实时科技趋势仪表盘，部署在 Cloudflare 边缘平台上。聚合 GitHub Trending 仓库和多源 RSS 新闻，提供 AI 分析和中文翻译能力。
 
 ## 目录结构
 
@@ -52,7 +52,7 @@ trendpulse/
 - `/api/*` 请求 → Hono Worker 处理
 - 其他请求 → 静态 SPA 资源
 
-### 三大功能模块
+### 四大功能模块
 
 **1. GitHub Trending（`/api/github/trending`）**
 - 抓取 `github.com/trending` HTML 页面
@@ -73,13 +73,20 @@ trendpulse/
 - AI 输出语言：中文
 - 文件：`frontend/worker/services/ai-provider.ts` → `frontend/worker/routes/ai.ts`
 
+**4. 中文翻译（`POST /api/translate`）**
+- 使用 Cloudflare Workers AI 内置翻译模型 `@cf/meta/m2m100-1.2b`
+- 免费、无需用户 API Key，通过 `env.AI.run()` 调用
+- 批量并行翻译，单条失败不影响其他条目
+- 前端全局翻译开关（Header），状态持久化到 localStorage
+- 文件：`frontend/worker/services/translate.ts` → `frontend/worker/routes/translate.ts`
+
 ### 前端结构
 
 - 暗色主题（slate/violet/cyan 配色）
 - 两大板块：GitHub Trending 网格 + 新闻流（带分类标签页）
 - 每张卡片可触发 AI 分析，结果在模态面板中流式展示
 - 设置面板：配置 AI 提供商、API Key、模型（localStorage 持久化）
-- 自定义 Hooks：`useGithub`、`useNews`、`useAI`
+- 自定义 Hooks：`useGithub`、`useNews`、`useAI`、`useTranslation`
 
 ## 数据流
 
@@ -88,7 +95,8 @@ trendpulse/
   │
   ├─ GET /api/github/trending ──→ Worker 抓取 GitHub HTML → 返回 JSON
   ├─ GET /api/news/:category  ──→ Worker 抓取 RSS 源    → 返回 JSON
-  └─ POST /api/ai/explain     ──→ Worker 转发到 LLM API → SSE 流式返回
+  ├─ POST /api/ai/explain     ──→ Worker 转发到 LLM API → SSE 流式返回
+  └─ POST /api/translate      ──→ Worker AI 翻译模型     → 返回翻译 JSON
 ```
 
 无数据库，无缓存层，所有数据实时获取。

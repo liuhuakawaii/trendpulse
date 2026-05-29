@@ -23,11 +23,13 @@ export default function NewsCard({ item, onExplain }: NewsCardProps) {
         rel="noopener noreferrer"
         className="line-clamp-2 block font-semibold text-white transition-colors hover:text-cyan-300"
       >
-        {item.title}
+        {item.translatedTitle || item.title}
       </a>
 
-      {item.description && (
-        <p className="mt-2 line-clamp-2 text-sm text-slate-400">{item.description}</p>
+      {(item.translatedDescription || item.description) && (
+        <p className="mt-2 line-clamp-2 text-sm text-slate-400">
+          {item.translatedDescription || item.description}
+        </p>
       )}
 
       <button

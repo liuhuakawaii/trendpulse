@@ -2,6 +2,18 @@ import type { TrendingRepo, NewsItem, AIConfig } from '../types'
 
 const API_BASE = '/api'
 
+export interface TranslateItemRequest {
+  id: string
+  title?: string
+  description?: string
+}
+
+export interface TranslateItemResponse {
+  id: string
+  title?: string
+  description?: string
+}
+
 export async function fetchTrending(): Promise<TrendingRepo[]> {
   const resp = await fetch(`${API_BASE}/github/trending`)
   const data = await resp.json()
@@ -13,6 +25,19 @@ export async function fetchNews(category: string): Promise<NewsItem[]> {
   const resp = await fetch(`${API_BASE}/news/${category}`)
   const data = await resp.json()
   if (!data.success) throw new Error(data.error || 'Failed to fetch news')
+  return data.data
+}
+
+export async function translateItems(
+  items: TranslateItemRequest[]
+): Promise<TranslateItemResponse[]> {
+  const resp = await fetch(`${API_BASE}/translate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items }),
+  })
+  const data = await resp.json()
+  if (!data.success) throw new Error(data.error || 'Translation failed')
   return data.data
 }
 

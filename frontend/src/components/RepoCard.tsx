@@ -18,7 +18,7 @@ export default function RepoCard({ repo, onExplain }: RepoCardProps) {
           {repo.fullName}
         </a>
         <p className="mt-1 line-clamp-2 text-sm text-slate-400">
-          {repo.description || 'No description'}
+          {repo.translatedDescription || repo.description || 'No description'}
         </p>
       </div>
 
